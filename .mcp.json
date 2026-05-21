@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--user-data-dir=/Users/niklaz.hallberg/Projects/comfy-cloud-proxy/.playwright-profile",
+        "--browser=chromium"
+      ]
+    }
+  }
+}
