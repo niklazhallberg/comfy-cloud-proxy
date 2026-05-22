@@ -49,4 +49,20 @@ This is where the value compounds. Generation becomes one step in a longer chain
 
 ## Status
 
-Early stage. One canonical workflow shipped, more on the way. Reach out if there is a workflow you'd want exposed as a capability for your team.
+Early stage. One canonical workflow shipped, more on the way. Reach out (see Contact below) if there is a workflow you'd want exposed as a capability for your team.
+
+## Related
+
+- [`valtech-radon-comfy-cloud-skill`](https://github.com/niklazhallberg/valtech-radon-comfy-cloud-skill) — the Claude Code skill this proxy operates through (companion project by the same author)
+- [Comfy Cloud](https://cloud.comfy.org) — the hosted Comfy execution platform
+- [ComfyUI](https://github.com/comfyanonymous/ComfyUI) — upstream Comfy project
+- [Claude Code](https://claude.com/claude-code) — the agent runtime this proxy is designed to plug into
+
+## Contact
+
+Questions, feedback, or contributions? Contact the repo owner:
+
+**Niklaz Hallberg** — [niklaz.hallberg@valtech.com](mailto:niklaz.hallberg@valtech.com)
+Valtech RADON, Sweden (V_RADON, SE)
+
+Niklaz is also the author of the companion [`valtech-radon-comfy-cloud-skill`](https://github.com/niklazhallberg/valtech-radon-comfy-cloud-skill) Claude Code skill.
