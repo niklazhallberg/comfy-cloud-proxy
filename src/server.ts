@@ -9,7 +9,7 @@ import { z } from "zod";
 
 const server = new McpServer({
   name: "comfy-cloud-proxy",
-  version: "0.2.0"
+  version: "0.2.1"
 });
 
 function getCloudConfig(): { baseUrl: string; apiKey: string } | { error: string } {
@@ -1063,6 +1063,162 @@ server.tool(
       const msg = err instanceof Error ? err.message : String(err);
       return toolError(`Manifest read-back failed: ${msg}`);
     }
+  }
+);
+
+// =============================================================================
+// Section G — upload_workflow_to_userdata
+//
+// Commit: feat(proxy): add upload_workflow_to_userdata tool
+//
+// Pushes a workflow JSON (canvas or api format) to Cloud's per-user userdata
+// scratch area via POST /api/userdata/{path}. The uploaded file becomes
+// accessible in cloud.comfy.org's editor — either via File → Load Workflow,
+// or directly via the userdata API.
+//
+// Cloud's userdata endpoint is content-flat: subfolders don't auto-create on
+// POST. POST to /api/userdata/workflows/x.json returns 404 unless the
+// workflows/ subfolder has been created by the editor's own Save action first.
+// Therefore, default targets in this tool put files at root. Caller can pass
+// an explicit path; if it includes a subfolder that doesn't exist, the POST
+// will 404 and we surface that clearly.
+//
+// Test criteria:
+//   1. Given a canvas JSON path + remote filename, returns success with
+//      {modified, path, size}.
+//   2. Given a non-existent local file, returns isError early.
+//   3. Given a remote subfolder that doesn't exist, returns isError with
+//      Cloud's 404 message verbatim (no silent fallback).
+// =============================================================================
+
+server.tool(
+  "upload_workflow_to_userdata",
+  "Push a workflow JSON file to Cloud's per-user userdata so it shows up in cloud.comfy.org's editor. Default remote filename is the local file's basename at userdata root.",
+  {
+    localPath: z.string().min(1, "localPath is required"),
+    remotePath: z
+      .string()
+      .optional()
+      .describe(
+        "Path on Cloud's userdata (relative). If omitted, uses basename(localPath). Cloud subfolders do NOT auto-create — POST to a non-existent subfolder returns 404."
+      ),
+    overwrite: z
+      .boolean()
+      .default(true)
+      .describe("If false and remote file already exists, return error instead of replacing.")
+  },
+  async ({ localPath, remotePath, overwrite }) => {
+    const cfg = getCloudConfig();
+    if ("error" in cfg) return toolError(cfg.error);
+
+    let bytes: Buffer;
+    try {
+      bytes = await readFile(localPath);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return toolError(`Failed to read ${localPath}: ${msg}`);
+    }
+
+    const target = remotePath ?? basename(localPath);
+    const url = `${cfg.baseUrl}/api/userdata/${target.replace(/^\/+/, "")}`;
+
+    if (!overwrite) {
+      try {
+        const existsCheck = await fetch(url, { headers: { "X-API-Key": cfg.apiKey } });
+        if (existsCheck.ok) {
+          return toolError(
+            `Remote file already exists at userdata/${target} and overwrite=false. Refusing to replace.`
+          );
+        }
+      } catch {
+        // Couldn't check; proceed with upload.
+      }
+    }
+
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-Key": cfg.apiKey
+        },
+        body: new Uint8Array(bytes)
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return toolError(`Upload failed (network): ${msg}`);
+    }
+
+    if (!response.ok) {
+      const body = await response.text();
+      return toolError(
+        `Cloud error ${response.status} at userdata/${target}: ${body}\n` +
+          `Note: Cloud's userdata does NOT auto-create subfolders. If you POSTed to ` +
+          `workflows/x.json and got 404, save a workflow once via the editor first ` +
+          `(that creates the subfolder), then retry.`
+      );
+    }
+
+    const data = (await response.json()) as { modified?: number; path?: string; size?: number };
+    return toolOk({
+      remotePath: data.path ?? target,
+      sizeBytes: data.size ?? bytes.byteLength,
+      modifiedAt: data.modified
+        ? new Date(data.modified).toISOString()
+        : new Date().toISOString(),
+      localSourcePath: localPath,
+      accessibleAt: `${cfg.baseUrl}/api/userdata/${target}`
+    });
+  }
+);
+
+// =============================================================================
+// Section H — delete_workflow_from_userdata
+//
+// Commit: feat(proxy): add delete_workflow_from_userdata tool
+//
+// Wraps DELETE /api/userdata/{path}. Used for cleanup of old workflow
+// iterations.
+//
+// Test criteria:
+//   1. Given an existing remote path, returns success.
+//   2. Given a non-existent path, returns isError with Cloud's 404.
+//   3. Given a path with subfolder, behaves the same as upload (Cloud passes
+//      the path through verbatim).
+// =============================================================================
+
+server.tool(
+  "delete_workflow_from_userdata",
+  "Delete a workflow file from Cloud's userdata. Wraps DELETE /api/userdata/{path}.",
+  {
+    remotePath: z.string().min(1, "remotePath is required")
+  },
+  async ({ remotePath }) => {
+    const cfg = getCloudConfig();
+    if ("error" in cfg) return toolError(cfg.error);
+
+    const url = `${cfg.baseUrl}/api/userdata/${remotePath.replace(/^\/+/, "")}`;
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        method: "DELETE",
+        headers: { "X-API-Key": cfg.apiKey }
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return toolError(`Delete failed (network): ${msg}`);
+    }
+
+    if (!response.ok && response.status !== 204) {
+      const body = await response.text();
+      return toolError(`Cloud error ${response.status} at userdata/${remotePath}: ${body}`);
+    }
+
+    return toolOk({
+      deletedPath: remotePath,
+      httpStatus: response.status
+    });
   }
 );
 
