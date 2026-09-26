@@ -20,14 +20,6 @@ The workflows are also exported as portable JSON, so anything the assistant prod
 
 ## Why this matters
 
-### For Valtech Radon
-
-Radon already operates in "AI as a creative collaborator" territory. This makes the collaboration concrete:
-
-- **Prompt-to-pixel without context-switching.** A copywriter or art director iterating with an assistant can ask for variations directly and keep working — the model produces the artefact instead of producing instructions for a human to produce the artefact.
-- **A house workflow becomes a capability.** Every saved Comfy workflow — LoRA stacks, ControlNet rigs, brand-trained models — can be exposed as something the assistant *can do*, not something it can describe. Once a workflow is a capability, every team and every assistant inherits it.
-- **Provenance you can show a client.** Every generation is a structured request with a recoverable parameter set. When a client asks "how was this made," there is an answer.
-
 ### For video editors
 
 Editors lose hours to "I need 60 background plates, slightly different" or "make me 12 title-card alternatives." Those errands stop being errands:
@@ -53,7 +45,7 @@ Early stage. One canonical workflow shipped, more on the way. Reach out (see Con
 
 ## Related
 
-- [`valtech-radon-comfy-cloud-skill`](https://github.com/niklazhallberg/valtech-radon-comfy-cloud-skill) — the Claude Code skill this proxy operates through (companion project by the same author)
+- [`comfy-cloud-skill`](https://github.com/niklazhallberg/comfy-cloud-skill) — the Claude Code skill this proxy operates through (companion project by the same author)
 - [Comfy Cloud](https://cloud.comfy.org) — the hosted Comfy execution platform
 - [ComfyUI](https://github.com/comfyanonymous/ComfyUI) — upstream Comfy project
 - [Claude Code](https://claude.com/claude-code) — the agent runtime this proxy is designed to plug into
@@ -62,7 +54,6 @@ Early stage. One canonical workflow shipped, more on the way. Reach out (see Con
 
 Questions, feedback, or contributions? Contact the repo owner:
 
-**Niklaz Hallberg** — [niklaz.hallberg@valtech.com](mailto:niklaz.hallberg@valtech.com)
-Valtech RADON, Sweden (V_RADON, SE)
+**Niklaz Hallberg** — [niklaz.a.hallberg@gmail.com](mailto:niklaz.a.hallberg@gmail.com)
 
-Niklaz is also the author of the companion [`valtech-radon-comfy-cloud-skill`](https://github.com/niklazhallberg/valtech-radon-comfy-cloud-skill) Claude Code skill.
+Niklaz is also the author of the companion [`comfy-cloud-skill`](https://github.com/niklazhallberg/comfy-cloud-skill) Claude Code skill.
