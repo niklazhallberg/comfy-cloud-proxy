@@ -4,7 +4,7 @@
       "command": "npx",
       "args": [
         "@playwright/mcp@latest",
-        "--user-data-dir=/Users/niklaz.hallberg/Projects/comfy-cloud-proxy/.playwright-profile",
+        "--user-data-dir=.playwright-profile",
         "--browser=chromium"
       ]
     }
