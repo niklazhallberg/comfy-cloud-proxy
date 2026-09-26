@@ -5,7 +5,7 @@
 ![Version 0.3.0](https://img.shields.io/badge/version-0.3.0-blue)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-An MCP server that lets Claude Code **run ComfyUI workflows on [Comfy Cloud](https://cloud.comfy.org)**: upload inputs, submit a graph, track the job, download the outputs, and log what it cost. Every submission goes through a hard cost check first.
+An MCP server that lets Claude Code **run ComfyUI workflows on [Comfy Cloud](https://cloud.comfy.org)**: upload inputs, submit a graph, track the job, download the outputs, and log what it cost. Every `submit_workflow` call goes through a hard cost check first.
 
 > **New to the terms?** An *MCP server* exposes tools that an AI agent can call. This one gives Claude Code the tools to operate Comfy Cloud. The companion **[comfy-cloud-skill](https://github.com/niklazhallberg/comfy-cloud-skill)** gives Claude the know-how to *design* the workflows. Start there for the full picture and demo.
 
@@ -35,7 +35,7 @@ The proxy is deliberately thin. It holds no workflow knowledge, only safe and ve
 | `view_output` | Download a result. Follows the storage redirect without leaking the API key |
 | `write_manifest` | Write a reproducibility record: workflow, seed, parameters, and cost broken down per node |
 | `upload_workflow_to_userdata` / `delete_workflow_from_userdata` | Put a workflow into your Comfy Cloud editor so you can inspect or fine-tune it |
-| `submit_simple_txt2img` / `export_simple_txt2img_workflow` | Minimal SD 1.5 example, kept as a smoke test |
+| `submit_simple_txt2img` / `export_simple_txt2img_workflow` | Minimal SD 1.5 smoke test. `submit_simple_txt2img` bypasses the cost gate and has no `dry_run`; use `export_…` to preview it |
 
 ## Quick start
 
