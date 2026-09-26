@@ -1,11 +1,29 @@
 {
   "name": "comfy-cloud-proxy",
-  "version": "0.2.1",
+  "version": "0.3.0",
+  "description": "MCP server that lets Claude Code submit, monitor and retrieve ComfyUI workflows on Comfy Cloud, with a hard cost gate.",
+  "license": "MIT",
+  "author": "Niklaz Hallberg",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/niklazhallberg/comfy-cloud-proxy.git"
+  },
+  "keywords": [
+    "mcp",
+    "claude-code",
+    "comfyui",
+    "comfy-cloud"
+  ],
   "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "tsx src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test test/*.test.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
